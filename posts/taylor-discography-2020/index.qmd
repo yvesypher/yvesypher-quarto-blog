@@ -1,0 +1,419 @@
+---
+title: "Taylor Swift's  Music Journey From Debut To 2020 🎶"
+author: "Xuan Nhat Minh Nguyen"
+date: "2023-09-03"
+categories: [Taylor Swift, music, discography]
+image: "image.jpg"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, echo = FALSE)
+library(tidyverse)
+library(dplyr)
+library(highcharter)
+library(wordcloud2)
+library(tidytext)
+library(textdata)
+library(kableExtra)
+```
+
+## 👱‍♀️ Taylor Swift is ...
+
+::: grid
+::: g-col-4
+![Taylor Swift at the 65th Grammy Red Carpet. Retrieved at [People](https://people.com/fashion/taylor-swift-crossbody-saddle-bag/)](taylor_image.png){.caption}
+:::
+
+::: g-col-8
+Taylor Swift, born on December 13, 1989, is a highly influential American singer and songwriter. She made her debut in **2006** with the self-titled album - **"Taylor Swift"**, marking the beginning of an exceptional career. With **8** studio albums over 14 years of her music career that transitioned from country to pop genre, she has consistently redefined her musical style and attracted a considerable fanbase supporting her. Her estimated net worth is approximately **$780,000,000**, making her one of the wealthiest musicians globally. Her extraordinary talent has also earned her a multitude of awards, including multiple Grammy awards, Billboard Music Awards, MTV Video Music Awards, and American Music Awards, indicating her status as a musical powerhouse.
+:::
+:::
+
+## ... A best-seller album queen 💽 {#sec-sales}
+
+What truly makes Taylor Swift outstanding is her remarkable album sales. She has consistently broken records and set new standards for album sales in the music industry. All of her albums have achieved extraordinary sales figures, with millions of copies sold worldwide, as shown in @fig-sales-plot.
+
+```{r sales-plot}
+#| label: fig-sales-plot
+#| fig-cap: "Taylor Swift's Album Sales from 2006 to 2020"
+
+albumsales <- read.csv(here::here("data/sales.csv"))
+
+albumsales %>%
+  filter(artist == "Taylor Swift",
+         country %in% c("WW", "US", "UK")) %>%
+  mutate(
+    released = as.numeric(str_sub(released,-4)),
+    country = recode(
+      country,
+      "WW" = "Worldwide",
+      "US" = "United States",
+      "UK" = "United Kingdom"
+    )
+  ) %>%
+  pivot_wider(names_from = country, values_from = sales) %>%
+  mutate(`Other Countries` = `Worldwide` - `United States` - `United Kingdom`) %>%
+  select(c(
+    title,
+    released,
+    `United States`,
+    `United Kingdom`,
+    `Other Countries`
+  )) %>%
+  pivot_longer(!c(title, released),
+               names_to = "country",
+               values_to = "sales") %>%
+  hchart(
+    'bar',
+    hcaes(
+      x = reorder(title, released),
+      y = sales,
+      group = 'country'
+    ),
+    stacking = "normal",
+    borderColor = "transparent"
+  ) %>%
+  hc_colors(c("#444e86", "#ffa600", "#ff6e54")) %>%
+  hc_title(
+    text = "Taylor Swift's Album Sales",
+    style = list(
+      fontSize = "18px",
+      fontFamily = "Roboto",
+      fontWeight = "bold",
+      color = "#35383C"
+    )
+  ) %>%
+  hc_xAxis(title = list(
+    text = "Albums",
+    style = list(
+      fontSize = "12px",
+      fontFamily = "Roboto",
+      fontWeight = "bold",
+      color = "#35383C"
+    )
+  )) %>%
+  hc_yAxis(title = list(
+    text = "Sales",
+    style = list(
+      fontSize = "12px",
+      fontFamily = "Roboto",
+      fontWeight = "bold",
+      color = "#35383C"
+    )
+  )) %>%
+  hc_legend(title = list(text = "Countries"), align = "center")
+
+# sales_plot <- sales <<- read.csv(here::here("data/sales.csv")) %>%
+#   filter(artist == "Taylor Swift",
+#          country %in% c("WW", "US", "UK")) %>%
+#   mutate(
+#     released = as.numeric(str_sub(released, -4)),
+#     country = recode(
+#       country,
+#       "WW" = "Worldwide",
+#       "US" = "United States",
+#       "UK" = "United Kingdom"
+#     )
+#   ) %>%
+#   pivot_wider(names_from = country, values_from = sales) %>%
+#   mutate(`Other Countries` = `Worldwide` - `United States` - `United Kingdom`) %>%
+#   select(c(
+#     title,
+#     released,
+#     `United States`,
+#     `United Kingdom`,
+#     `Other Countries`
+#   )) %>%
+#   pivot_longer(!c(title, released),
+#                names_to = "country",
+#                values_to = "sales") %>%
+#   ggplot(aes(
+#   x = sales,
+#   y = reorder(title, released, decreasing = TRUE),
+#   fill = country,
+#   text = paste("Sales:", scales::dollar(sales), "<br>Album: ", title, "<br>Country: ", country)
+# )) +
+#   geom_bar(position = "stack", stat = "identity") +
+#   labs(
+#     x = "Sales",
+#     y = "Albums",
+#     title = "Taylor Swift's Album Sales",
+#     fill = "Country"
+#   ) +
+#   scale_fill_manual(values = c("#444e86", "#ffa600", "#ff6e54")) +
+#   theme(
+#     plot.title = element_text(size = 16, face = "bold"),
+#     axis.title.x = element_text(size = 12, face = "bold"),
+#     axis.title.y = element_text(size = 12, face = "bold")
+#   )
+# plotly::ggplotly(sales_plot, tooltip = c("text"))
+```
+
+It is also visible in @fig-sales-plot that **"Fearless"** and **"1989"** reached the coveted milestone of over **10 million** copies sold in the United States alone. These achievements earned her Diamond certifications from the Recording Industry Association of America (RIAA), a distinction held by only a select few artists.
+
+Taylor Swift's accolades extend beyond the United States. Her album **"Red"** achieved multi-platinum status in numerous countries, solidifying her global appeal. Moreover, she has received numerous awards and recognition for her album sales, including 3 Grammy Awards for Album of the Year with **"Fearless"** in 2009, **"1989"** in 2015, and **"Folklore"** in 2020 as well as other prestigious awards.
+
+## ... A chart-dominance pop icon 📈 {#sec-charts}
+
+Taylor Swift's chart dominance is another facet of her illustrious career. Her albums have consistently topped various music charts, including the Billboard 200. Her ability to attract fans as well as music lovers and maintain chart-topping positions for extended periods is genuinely extraordinary.
+
+```{r charts-plot}
+#| label: fig-charts-plot
+#| fig-cap: "Taylor Swift's Album Chart Performance from 2006 to 2020"
+
+albumcharts <<- read.csv(here::here("data/charts.csv"))
+
+albumcharts %>%
+  select(-re_release) %>%
+  mutate(
+    chart_position = as.numeric(chart_position),
+    released = as.numeric(str_sub(released,-4)),
+    chart = recode(
+      chart,
+      "US" = "United States",
+      "AUS" = "Australia",
+      "CAN" = "Canada",
+      "JPN" = "Japan",
+      "UK" = "United Kingdom"
+    )
+  ) %>%
+  filter(
+    chart %in% c(
+      "United States",
+      "Australia",
+      "Canada",
+      "Japan",
+      "United Kingdom"
+    ),
+    artist == "Taylor Swift"
+  ) %>%
+  drop_na() %>%
+  hchart("line",
+         hcaes(x = title, y = chart_position, group = chart)) %>%
+  hc_title(
+    text = "Taylor Swift 's Album Charts",
+    style = list(
+      fontSize = "18px",
+      fontFamily = "Roboto",
+      fontWeight = "bold",
+      color = "#35383C"
+    )
+  ) %>%
+  hc_xAxis(title = list(
+    text = "Albums",
+    style = list(
+      fontSize = "10px",
+      fontFamily = "Roboto",
+      fontWeight = "bold",
+      color = "#35383C"
+    )
+  )) %>%
+  hc_yAxis(reversed = TRUE,
+           title = list(
+             text = "Peak Chart Position",
+             style = list(
+               fontSize = "10px",
+               fontFamily = "Roboto",
+               fontWeight = "bold",
+               color = "#35383C"
+             )
+           )) %>%
+  hc_legend(title = list(text = "Countries"),
+            align = "center") %>%
+  hc_colors(c("#444e86",
+              "#955196",
+              "#dd5182",
+              "#ff6e54",
+              "#ffa600"))
+```
+
+@fig-charts-plot illustrates her impressive album chart performance in the top five global music markets. It is noticeable that her debut album peaked at **No.5** on the Billboard Hot 200 in the US, which is an achievement yet a challenge even for experienced artists. Since then, albums consistently peaked at **No.1** on this chart. In international charts, the peak of her chart never wavered, always remaining within the illustrious top 10. 2020 witnessed a historic moment when **"Folklore"** gracefully debuted at **No.1** on the Billboard Hot 200 chart, marking Taylor Swift's seventh No.1 album in the United States. Overall, her album chart performance trend is consistently upward, solidifying her status as a chart-topping sensation.
+
+## ... A storyteller with striking poetry 🎼
+
+Beyond her sales figures and chart-topping hits mentioned in @sec-sales and @sec-charts, Taylor Swift's lyrics have left an indelible mark on the hearts of her listeners. Her songwriting is often described as poetic, heartfelt, and relatable. She has an uncanny ability to translate her personal experiences and emotions into music.
+
+```{r}
+#| label: fig-wordcloud
+#| fig-cap: "Taylor Swift's Lyrics Word Cloud"
+
+tns <- getNamespace("textdata")
+
+assignInNamespace(x = "printer", value = function(...) 1, ns = tns)
+
+nrc <- get_sentiments("nrc")
+
+albumlyrics <- read.csv(here::here("data/taylor_swift_lyrics.csv"))
+
+taylor_wc <- albumlyrics %>%
+      unnest_tokens("word", Lyrics) %>%
+      anti_join(stop_words, by = "word") %>%
+      count(word) %>%
+      arrange(desc(n)) %>%
+      head(100)
+
+    wordcloud2(taylor_wc,
+                color=rep_len(c("#444e86",
+                                "#955196",
+                                "#dd5182",
+                                "#ff6e54",
+                                "#ffa600"),nrow(taylor_wc)))
+
+
+```
+
+@fig-wordcloud depicts the top 100 most frequent words in all Taylor Swift's songs, which reveals the recurring themes in her lyrics, with words such as **"Love"**, **"time"**, **"wanna"**, and **"baby"** prominently featured. These frequently mentioned words provide insights into the underlying themes she attempts to convey through her songwriting, which can be discovered through @fig-sentiments.
+
+```{r}
+#| label: fig-sentiments
+#| fig-cap: "Taylor Swift's Lyrics Sentiments"
+
+windowsFonts(A = windowsFont("Roboto"))
+taylor_sentiment <- albumlyrics %>%
+  unnest_tokens("word", Lyrics) %>%
+  inner_join(nrc, by = "word") %>%
+      group_by(sentiment, Album) %>%
+      summarise(n = n())
+
+taylor_sentiment %>% 
+  ggplot(aes(x = n,
+             y = sentiment)) +
+  geom_bar(stat = "identity", fill = "#ff6e54") +
+  facet_wrap(~Album, ncol = 4) +
+  labs(
+    x = "Number of words",
+    y = "Sentiments",
+    title = "Shades Of Taylor Swift's Lyrics"
+  ) +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", family = "A", hjust = 0.5, color = "#35383C"),
+    axis.title.x = element_text(size = 10, face = "bold", family = "A", color = "#35383C"),
+    axis.title.y = element_text(size = 10, face = "bold", family = "A", color = "#35383C")
+  )
+```
+
+@fig-sentiments demonstrates the distribution of words by sentiment in each of Taylor Swift's discography. What immediately catches the eye is the consistent prevalence of positive and joyful vibes across all her albums. However, beneath this consistency, there is a discernible evolution in mood.
+
+In her earlier career, such albums as **"Taylor Swift"**, **"Fearless"**, and **"Speak Now"** deliver positive, negative, and joyful vibes as the primary theme. Nevertheless, delving into her later albums such as **"Reputation"**, **"Lover"**, and **"Folklore"**, we encounter an even more diverse array of emotions. This transformation reflects Taylor Swift's growth and evolving life experiences, which she skillfully weaves into her songs.
+
+Whether she is singing about the joys and heartaches of love, the challenges of growing up, or the complexities of life in the spotlight, her lyrics resonate with audiences of all ages. Fans worldwide find solace and connection in her music, a testament to her extraordinary songwriting talent.
+
+### 👉Now you know how awesome she is ... Are you ready to join her fan club? Let's support her for more beautiful music masterpieces ! 🙌
+
+## Reference
+
+### Data source
+
+This analysis uses three data sets demonstrating the album sales, album charts, and lyrics of **Taylor Swift**. Data is retrieved from [Beyoncé and Taylor Swift Lyrics](https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-29) repository, which is collected and refined by [Rosie Baillie](https://twitter.com/Rosie_Baillie_) and [Dr. Sara Stoudt](https://twitter.com/Rosie_Baillie_). To assist in analyzing sentiments in Taylor Swift's lyrics, I also use the NRC Word-Emotion data set, which is loaded from the third-party package `TidyText`. This data is originally retrieved from [NRC Word-Emotion Association Lexicon](https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm).
+
+### Data dictionary
+
+@tbl-sales, @tbl-charts, @tbl-lyrics, and @tbl-nrc show the data dictionary for each corresponding data set which provide information about the variables together with their class and description.
+
+#### sales.csv file
+
+```{r}
+#| label: tbl-sales
+#| tbl-cap: Data dictionary of album sales data set
+sales_df <- data.frame(
+  Variable = names(albumsales),
+  Class = class(names(albumsales)),
+  Description = c(
+    "Artist name",
+    "Song title",
+    "Country for sales",
+    "Sales in dollars",
+    "released date",
+    "Re-released date",
+    "Label released under",
+    "Formats released as"
+  )
+)
+kable(sales_df)
+```
+
+#### charts.csv file
+
+```{r}
+#| label: tbl-charts
+#| tbl-cap: Data dictionary of album charts data set
+charts_df <- data.frame(
+  Variable = names(albumcharts),
+  Class = class(names(albumcharts)),
+  Description = c(
+    "Artist name",
+    "Song title",
+    "released date",
+    "Re-released date",
+    "Label released under",
+    "Formats released as",
+    "Country Chart",
+    "Highest Chart position"
+  )
+)
+kable(charts_df)
+```
+
+#### taylor_swift_lyrics.csv file
+
+```{r}
+#| label: tbl-lyrics
+#| tbl-cap: Data dictionary of Taylor Swift's lyrics data set
+lyrics_df <- data.frame(
+  Variable = names(albumlyrics),
+  Class = class(names(albumlyrics)),
+  Description = c(
+    "Artist",
+    "Album name",
+    "Title of song",
+    "Lyrics"
+  )
+)
+kable(lyrics_df)
+```
+
+#### nrc data set
+
+```{r}
+#| label: tbl-nrc
+#| tbl-cap: Data dictionary of NRC Word-Emotion data set
+nrc_df <- data.frame(
+  Variable = names(nrc),
+  Class = class(names(nrc)),
+  Description = c("Vocabulary",
+                  "Words about sentiments and emotions")
+)
+kable(nrc_df)
+```
+
+### Citation
+
+Baillie, R. & Stoudt, S. (2020). *Beyoncé and Taylor Swift Lyrics*. Github. <https://github.com/rfordatascience/tidytuesday/tree/master/data/2020/2020-09-29>
+
+Hvitfeldt, E. (2022). *textdata: Download and Load Various Text Datasets*. R package version 0.4.4, <https://CRAN.R-project.org/package=textdata>.
+
+Kunst, J. (2022). *highcharter: A Wrapper for the 'Highcharts' Library*. R package version 0.9.4, <https://CRAN.R-project.org/package=highcharter>.
+
+Lang, D. & Chien, G. (2018). *wordcloud2: Create Word Cloud by 'htmlwidget'*. R package version 0.2.1, <https://CRAN.R-project.org/package=wordcloud2>.
+
+Mohammad, S. M. (2021). Sentiment Analysis: Automatically Detecting Valence, Emotions, and Other Affectual States from Text. arXiv, 2005.11882. To Appear as a Book chapter in The 2nd Edition of Emotion Measurement, Elsevier, 2021.
+
+People. (2023, September 1). *Taylor Swift Crossbody Saddle Bag \[Photograph\]*. People. <https://people.com/fashion/taylor-swift-crossbody-saddle-bag/>
+
+Silge, J. & Robinson, D. (2016). "tidytext: Text Mining and Analysis Using Tidy Data Principles in R." *JOSS*, *1*(3). doi:10.21105/joss.00037 <https://doi.org/10.21105/joss.00037>, <http://dx.doi.org/10.21105/joss.00037>.
+
+Wickham, H., Averick, M., Bryan, J., Chang, W., McGowan, L. D., François, R., Grolemund, G., Hayes, A., Henry, L., Hester, J., Kuhn, M., Pedersen, T. L., Miller, E., Bache, S. M., Müller, K., Ooms, J., Robinson, D., Seidel, D. P., Spinu, V., Takahashi, K., Vaughan, D., Wilke, C., & Yutani, H. (2019). Welcome to the tidyverse. *Journal of Open Source Software, 4(43), 1686*. <https://doi.org/10.21105/joss.01686>.
+
+Wickham, H., François, R., Henry, L., Müller, K., & Vaughan, D. (2023). *dplyr: A Grammar of Data Manipulation*. R package version 1.1.2, <https://CRAN.R-project.org/package=dplyr>.
+
+Zhu, H. (2021). *kableExtra: Construct Complex Table with 'kable' and Pipe Syntax*. R package version 1.3.4, <https://CRAN.R-project.org/package=kableExtra>.
+
+<details>
+
+<summary>Session information</summary>
+
+```{r, echo = FALSE}
+sessioninfo::session_info()
+```
+
+</details>

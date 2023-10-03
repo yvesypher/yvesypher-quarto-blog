@@ -1,0 +1,20 @@
+project:
+  type: website
+  output-dir: _output
+
+website:
+  title: "Minh's universe"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/etc5523-2022
+      - icon: linkedin
+        href: https://www.linkedin.com/in/minh-nguyen-1203/
+format:
+  html:
+    theme: flatly
+    css: styles.css
+
+
+
